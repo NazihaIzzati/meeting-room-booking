@@ -29,6 +29,7 @@ Route::get('/dashboard', function () {
 
     $bookings = Booking::with('meetingRoom', 'user')
         ->whereBetween('date', [$startOfCalendar->toDateString(), $endOfCalendar->toDateString()])
+        ->where('status', 'approved')
         ->get();
 
     $rooms = MeetingRoom::all();
