@@ -7,6 +7,12 @@
     <!-- Header -->
     <div class="bg-white shadow">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            <div class="mb-4">
+                <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center text-primary hover:text-primary-dark font-medium transition-colors duration-200">
+                    <i class='bx bx-arrow-back mr-2'></i>
+                    Back to Dashboard
+                </a>
+            </div>
             <div class="flex items-center justify-between">
                 <div>
                     <h1 class="text-3xl font-bold text-gray-900">Manage Meeting Rooms</h1>

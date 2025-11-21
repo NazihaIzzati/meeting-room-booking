@@ -3,10 +3,24 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-primary-light to-white py-10 px-4">
     <div class="max-w-5xl w-full bg-white rounded-2xl shadow-lg p-12 flex flex-col items-center mx-auto mb-10 relative">
-        <a href="/" class="absolute left-8 top-8 flex items-center gap-2 text-primary font-semibold hover:underline hover:text-primary-dark transition-colors duration-200">
-            <i class='bx bx-arrow-back'></i>
-            Back to Home
-        </a>
+        @auth
+            @if(auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="absolute left-8 top-8 flex items-center gap-2 text-primary font-semibold hover:underline hover:text-primary-dark transition-colors duration-200">
+                    <i class='bx bx-arrow-back'></i>
+                    Back to Dashboard
+                </a>
+            @else
+                <a href="/" class="absolute left-8 top-8 flex items-center gap-2 text-primary font-semibold hover:underline hover:text-primary-dark transition-colors duration-200">
+                    <i class='bx bx-arrow-back'></i>
+                    Back to Home
+                </a>
+            @endif
+        @else
+            <a href="/" class="absolute left-8 top-8 flex items-center gap-2 text-primary font-semibold hover:underline hover:text-primary-dark transition-colors duration-200">
+                <i class='bx bx-arrow-back'></i>
+                Back to Home
+            </a>
+        @endauth
         <div class="flex flex-col items-center mb-6">
             <div class="h-16 w-16 rounded-full bg-primary flex items-center justify-center shadow mb-3">
                 <i class='bx bx-time text-white text-3xl'></i>

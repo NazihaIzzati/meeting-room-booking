@@ -50,44 +50,7 @@
                 </div>
                 
                 <div class="flex items-center space-x-2 sm:space-x-4">
-                    @auth
-                        @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="text-gray-700 hover:text-primary transition-colors duration-200 flex items-center space-x-1">
-                            <i class='bx bx-home-alt'></i>
-                            <span class="hidden sm:inline">Dashboard</span>
-                        </a>
-                        @endif
-                        <a href="{{ route('bookings.index') }}" class="text-gray-700 hover:text-primary transition-colors duration-200 flex items-center space-x-1">
-                            <i class='bx bx-calendar'></i>
-                            <span class="hidden sm:inline">My Bookings</span>
-                        </a>
-                        <a href="{{ route('availability.index') }}" class="text-gray-700 hover:text-primary transition-colors duration-200 flex items-center space-x-1">
-                            <i class='bx bx-time'></i>
-                            <span class="hidden sm:inline">Availability</span>
-                        </a>
-                        <div class="relative group">
-                            <button class="flex items-center space-x-1 sm:space-x-2 text-gray-700 hover:text-primary transition-colors duration-200">
-                                <i class='bx bx-user-circle text-lg sm:text-xl'></i>
-                                <span class="hidden sm:inline">{{ auth()->user()->name }}</span>
-                                <i class='bx bx-chevron-down hidden sm:inline'></i>
-                            </button>
-                            <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                @if(auth()->check() && auth()->user()->isAdmin())
-                                <a href="{{ route('admin.profile.show') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 flex items-center space-x-2">
-                                    <i class='bx bx-user'></i>
-                                    <span>Profile</span>
-                                </a>
-                                @endif
-                                <form method="POST" action="{{ route('admin.logout') }}" class="block">
-                                    @csrf
-                                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2">
-                                        <i class='bx bx-log-out'></i>
-                                        <span>Logout</span>
-                                    </button>
-                                </form>
-                            </div>
-                        </div>
-                    @endauth
+                    {{-- Navigation items hidden for public users - only visible to authenticated users --}}
                 </div>
             </div>
         </div>

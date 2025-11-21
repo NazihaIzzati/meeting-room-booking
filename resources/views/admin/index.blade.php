@@ -102,6 +102,22 @@
                 <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                     <h3 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
                     <div class="space-y-3">
+                        @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.rooms.create') }}" class="flex items-center p-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105">
+                            <i class='bx bx-building text-2xl mr-3'></i>
+                            <div>
+                                <p class="font-semibold">Create Meeting Room</p>
+                                <p class="text-sm opacity-90">Add a new meeting room</p>
+                            </div>
+                        </a>
+                        <a href="{{ route('admin.rooms.index') }}" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200">
+                            <i class='bx bx-building-house text-2xl text-gray-600 mr-3'></i>
+                            <div>
+                                <p class="font-semibold text-gray-900">Manage Rooms</p>
+                                <p class="text-sm text-gray-600">View and edit rooms</p>
+                            </div>
+                        </a>
+                        @endif
                         <a href="/bookings/create" class="flex items-center p-4 bg-gradient-to-r from-primary to-primary-dark text-white rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-105">
                             <i class='bx bx-plus-circle text-2xl mr-3'></i>
                             <div>

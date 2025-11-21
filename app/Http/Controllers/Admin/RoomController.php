@@ -11,20 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class RoomController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (!Auth::check() || !Auth::user()->isAdmin()) {
-                abort(403, 'Unauthorized');
-            }
-            return $next($request);
-        });
-    }
+    // Middleware is handled by the route group in web.php
 
     /**
      * Display a listing of rooms (READ operation)
