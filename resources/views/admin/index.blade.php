@@ -127,13 +127,26 @@
                             </div>
                         </a>
                         
-                        <a href="{{ route('admin.profile.show') }}" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200">
-                            <i class='bx bx-user text-2xl text-gray-600 mr-3'></i>
-                            <div>
-                                <p class="font-semibold text-gray-900">Profile Settings</p>
-                                <p class="text-sm text-gray-600">Update your information</p>
+                    <a href="{{ route('admin.profile.show') }}" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200">
+                        <i class='bx bx-user text-2xl text-gray-600 mr-3'></i>
+                        <div>
+                            <p class="font-semibold text-gray-900">Profile Settings</p>
+                            <p class="text-sm text-gray-600">Update your information</p>
+                        </div>
+                    </a>
+
+                    <form method="POST" action="{{ route('admin.logout') }}" id="dashboard-logout-form" class="flex-1">
+                        @csrf
+                        <button type="button"
+                            class="w-full flex items-center p-4 bg-red-50 hover:bg-red-100 rounded-xl transition-all duration-200 text-red-700 font-semibold"
+                            onclick="confirmLogout('dashboard-logout-form')">
+                            <i class='bx bx-log-out text-2xl mr-3'></i>
+                            <div class="text-left">
+                                <p>Logout</p>
+                                <p class="text-sm text-red-500">End current session</p>
                             </div>
-                        </a>
+                        </button>
+                    </form>
                     </div>
                 </div>
             </div>

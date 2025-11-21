@@ -60,6 +60,7 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->as('admin.')->group(funct
     Route::resource('rooms', RoomController::class);
     Route::resource('meeting-rooms', MeetingRoomController::class)->names('rooms');
     Route::patch('/meeting-rooms/{room}/status', [MeetingRoomController::class, 'updateStatus'])->name('rooms.status');
+    Route::patch('/rooms/{room}/status', [MeetingRoomController::class, 'updateStatus'])->name('rooms.status.alias');
 
     // Booking Management (Full CRUD)
     Route::resource('bookings', AdminBookingController::class)->except(['create', 'store'])->names('bookings');
