@@ -1,0 +1,17 @@
+node_modules
+vendor
+.git
+.gitignore
+.env
+.env.backup
+*.log
+storage/logs
+bootstrap/cache
+tests
+.phpunit.result.cache
+.idea
+.vscode
+*.md
+docs
+assests
+

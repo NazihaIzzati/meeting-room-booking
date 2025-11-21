@@ -1,0 +1,16 @@
+node_modules
+vendor
+storage
+bootstrap/cache
+tests
+.phpunit.result.cache
+.env
+.env.backup
+*.log
+.git
+.idea
+.vscode
+*.md
+docs
+assests
+
