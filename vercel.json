@@ -1,22 +1,25 @@
 {
   "version": 2,
-  "functions":{
+  "buildCommand": "curl -sS https://getcomposer.org/installer | php && php composer.phar install --no-dev --optimize-autoloader --no-interaction",
+  "installCommand": "curl -sS https://getcomposer.org/installer | php && php composer.phar install --no-dev --optimize-autoloader --no-interaction",
+  "outputDirectory": ".",
+  "functions": {
     "api/index.php": {
-      "runtime": "vercel-php@0.7.3"
+      "runtime": "vercel-php@0.7.4"
     }
   },
   "routes": [
     {
+      "src": "/assests/(.*)",
+      "dest": "/public/assests/$1"
+    },
+    {
       "src": "/build/(.*)",
-      "dest": "/build/$1"
+      "dest": "/public/build/$1"
     },
     {
-      "src": "/images/(.*)",
-      "dest": "/images/$1"
-    },
-    {
-      "src": "/storage/(.*)",
-      "dest": "/storage/$1"
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot|json))",
+      "dest": "/public/$1"
     },
     {
       "src": "/(.*)",
@@ -26,7 +29,7 @@
   "env": {
     "APP_ENV": "production",
     "APP_DEBUG": "true",
-    "APP_URL": "https://dcmtrd.vercel.app",
+    "APP_URL": "https://meeting-room-booking-topaz.vercel.app",
 
     "APP_CONFIG_CACHE": "/tmp/config.php",
     "APP_EVENTS_CACHE": "/tmp/events.php",
