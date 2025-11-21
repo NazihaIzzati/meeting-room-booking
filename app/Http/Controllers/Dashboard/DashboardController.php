@@ -50,7 +50,7 @@ class DashboardController extends Controller
         ];
         $weekDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 
-        return view('admin.dashboard.index', compact('rooms', 'bookings', 'slotLabels', 'timeSlots', 'weeklyTimes', 'weekDays'));
+        return view('admin.index', compact('rooms', 'bookings', 'slotLabels', 'timeSlots', 'weeklyTimes', 'weekDays'));
     }
 
     /**

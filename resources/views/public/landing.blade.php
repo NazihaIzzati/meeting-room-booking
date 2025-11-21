@@ -38,22 +38,6 @@
                     Experience seamless meeting room reservations with our intelligent booking platform. 
                     <span class="font-semibold text-[#FE8000]">Book smarter, meet better.</span>
                 </p>
-                
-                <!-- Feature Pills -->
-                <div class="flex flex-wrap gap-3 justify-center lg:justify-start mb-8">
-                    <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
-                        <i class='bx bx-zap text-[#FE8000] text-sm'></i>
-                        <span class="text-sm font-medium text-white/90">Lightning Fast</span>
-                    </div>
-                    <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
-                        <i class='bx bx-shield text-[#FE8000] text-sm'></i>
-                        <span class="text-sm font-medium text-white/90">Secure</span>
-                    </div>
-                    <div class="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20">
-                        <i class='bx bx-mobile text-[#FE8000] text-sm'></i>
-                        <span class="text-sm font-medium text-white/90">Mobile Ready</span>
-                    </div>
-                </div>
             </div>
             
             <!-- Right Content - Modern Card -->
@@ -97,7 +81,7 @@
         </div>
         
         <!-- Stats Section -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 w-full max-w-5xl mx-auto">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 w-full max-w-5xl mx-auto">
             <div class="group bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
                 <div class="text-center">
                     <div class="text-3xl font-black text-[#FE8000] mb-2 group-hover:scale-110 transition-transform duration-300">
@@ -115,24 +99,6 @@
                     <div class="text-sm font-semibold text-white/90 uppercase tracking-wider">Today's Bookings</div>
                     <div class="text-xs text-white/60 mt-1">Active Sessions</div>
                 </div>
-            </div>
-            <div class="group bg-white/10 backdrop-blur-xl rounded-2xl p-6 border border-white/20 hover:bg-white/15 transition-all duration-300">
-                <div class="text-center">
-                    <div class="text-3xl font-black text-[#FE8000] mb-2 group-hover:scale-110 transition-transform duration-300">
-                        {{ $meetingRooms->where('status', 'active')->count() }}
-                    </div>
-                    <div class="text-sm font-semibold text-white/90 uppercase tracking-wider">Ready Now</div>
-                    <div class="text-xs text-white/60 mt-1">Instant Access</div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Footer -->
-        <div class="text-center mt-12">
-            <div class="inline-flex items-center gap-2 text-white/60 text-sm">
-                <i class='bx bx-code-alt'></i>
-                <span>Powered by Modern Technology</span>
-                <i class='bx bx-code-alt'></i>
             </div>
         </div>
     </div>
@@ -154,7 +120,7 @@
         <!-- Room Grid -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-6 sm:gap-8">
             @foreach($meetingRooms as $room)
-            <div class="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden">
+            <div class="group bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 overflow-hidden {{ $roomAvailability[$room->id]['is_available'] ? '' : 'opacity-80 grayscale' }}">
                 <!-- Room Header -->
                 <div class="p-6 sm:p-8">
                     <div class="flex items-center justify-between mb-4">
@@ -195,7 +161,7 @@
                                 Book Now
                             </a>
                         @else
-                            <a href="/bookings/create?room={{ $room->id }}" class="flex-1 inline-flex items-center justify-center px-4 py-3 bg-gray-500 hover:bg-gray-600 text-white text-sm font-semibold rounded-xl transition-all duration-300 transform hover:scale-105 shadow-lg">
+                            <a href="/bookings/create?room={{ $room->id }}" class="flex-1 inline-flex items-center justify-center px-4 py-3 bg-gray-500 text-white text-sm font-semibold rounded-xl transition-all duration-300 shadow-lg cursor-not-allowed grayscale">
                                 <i class='bx bx-calendar-check mr-2'></i>
                                 View Schedule
                             </a>
@@ -249,7 +215,6 @@
                             <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Room</th>
                             <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Meeting Title</th>
                             <th class="hidden sm:table-cell px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Organizer</th>
-                            <th class="px-6 py-4 text-left text-sm font-semibold text-white uppercase tracking-wider">Status</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -269,11 +234,6 @@
                             </td>
                             <td class="hidden sm:table-cell px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                                 {{ $booking->pic_name }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                                    {{ ucfirst($booking->status) }}
-                                </span>
                             </td>
                         </tr>
                         @endforeach

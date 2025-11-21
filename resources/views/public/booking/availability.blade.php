@@ -24,8 +24,8 @@
     <div class="flex flex-col items-center gap-8 mt-8">
         @foreach($rooms as $room)
         @php
-            $roomBookings = $bookings->where('meeting_room_id', $room->id)->where('date', $date);
-            $isAvailable = !$roomBookings->where('status', '!=', 'cancelled')->count();
+            $roomBookings = $bookings->where('meeting_room_id', $room->id);
+            $isAvailable = $roomBookings->isEmpty();
             $nextAvailable = $isAvailable ? 'Available all day' : 'See schedule below';
         @endphp
         <div class="max-w-5xl w-full bg-gradient-to-br from-gray-50 to-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-2xl transition-shadow duration-300 group flex flex-col mx-auto">
@@ -78,11 +78,11 @@
                 @endif
             </div>
             <!-- Today's Schedule -->
-            @if($roomBookings->where('status', '!=', 'cancelled')->count() > 0)
+            @if($roomBookings->count() > 0)
             <div class="bg-gradient-to-r from-gray-50 to-gray-100 px-10 py-6 border-t border-gray-100">
-                <p class="text-lg font-semibold text-gray-900 mb-3">Today's Schedule:</p>
+                <p class="text-lg font-semibold text-gray-900 mb-3">Schedule for {{ \Carbon\Carbon::parse($date)->format('F j, Y') }}:</p>
                 <div class="space-y-2">
-                    @foreach($roomBookings->where('status', '!=', 'cancelled')->sortBy('start_time') as $booking)
+                    @foreach($roomBookings->sortBy('start_time') as $booking)
                     <div class="flex items-center justify-between text-base bg-white rounded-lg p-4 shadow-sm">
                         <span class="text-gray-700 font-medium">{{ \Carbon\Carbon::parse($booking->start_time)->format('h:i A') }} - {{ \Carbon\Carbon::parse($booking->end_time)->format('h:i A') }}</span>
                         <span class="text-gray-600 truncate ml-2">{{ $booking->meeting_title }}</span>

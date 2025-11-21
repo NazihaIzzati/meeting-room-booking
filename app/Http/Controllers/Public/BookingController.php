@@ -63,8 +63,8 @@ class BookingController extends Controller
             'end_time' => 'required',
             'meeting_title' => 'required|string|max:255',
             'pic_name' => 'required|string|max:255',
-            'pic_email' => 'required|email|max:255',
-            'pic_phone' => 'required|string|max:32',
+            'pic_email' => 'nullable|email|max:255',
+            'pic_phone' => 'nullable|string|max:32',
             'pic_staff_id' => 'nullable|string|max:32',
             'recurrence' => 'nullable|in:daily,weekly,monthly',
             'recurrence_end_date' => 'nullable|date|after_or_equal:date',
@@ -76,21 +76,38 @@ class BookingController extends Controller
         $dates = [$request->date];
 
         if ($recurrence && $recurrenceEnd) {
-            $current = \Carbon\Carbon::parse($request->date);
-            $end = \Carbon\Carbon::parse($recurrenceEnd);
+            $current = \Carbon\Carbon::parse($request->date)->startOfDay();
+            $end = \Carbon\Carbon::parse($recurrenceEnd)->startOfDay();
+            
+            // Generate recurring dates
             while (true) {
-                if ($recurrence === 'daily') $current = $current->addDay();
-                elseif ($recurrence === 'weekly') $current = $current->addWeek();
-                elseif ($recurrence === 'monthly') $current = $current->addMonth();
-                if ($current->gt($end)) break;
+                if ($recurrence === 'daily') {
+                    $current = $current->copy()->addDay();
+                } elseif ($recurrence === 'weekly') {
+                    $current = $current->copy()->addWeek();
+                } elseif ($recurrence === 'monthly') {
+                    $current = $current->copy()->addMonth();
+                }
+                
+                // Check if current date is after the end date
+                if ($current->toDateString() > $end->toDateString()) {
+                    break;
+                }
+                
                 $dates[] = $current->toDateString();
+                
+                // Safety check to prevent infinite loops
+                if (count($dates) > 365) {
+                    break;
+                }
             }
         }
 
-        // Check for conflicts for all dates
+        // Check for conflicts for all dates (exclude cancelled bookings)
         foreach ($dates as $date) {
             $conflict = Booking::where('meeting_room_id', $request->meeting_room_id)
                 ->where('date', $date)
+                ->where('status', '!=', 'cancelled')
                 ->where(function($q) use ($request) {
                     $q->whereBetween('start_time', [$request->start_time, $request->end_time])
                       ->orWhereBetween('end_time', [$request->start_time, $request->end_time])
@@ -100,12 +117,13 @@ class BookingController extends Controller
                       });
                 })->exists();
             if ($conflict) {
-                return redirect('/dashboard')->with('error', 'This room is already booked for one or more of the selected dates/times.');
+                return redirect()->back()->withInput()->with('error', 'This room is already booked for the selected time slot. Please choose a different time.');
             }
         }
 
         // Create bookings
         $parentId = null;
+        $referenceId = null;
         foreach ($dates as $i => $date) {
             $booking = Booking::create([
                 'user_id' => Auth::id() ?: null,
@@ -118,11 +136,15 @@ class BookingController extends Controller
                 'pic_phone' => $request->pic_phone,
                 'pic_staff_id' => $request->pic_staff_id,
                 'meeting_title' => $request->meeting_title,
-                'status' => 'pending',
+                'status' => 'approved',
                 'recurrence' => $recurrence,
                 'recurrence_end_date' => $recurrenceEnd,
                 'parent_booking_id' => $parentId,
             ]);
+
+            if (is_null($referenceId)) {
+                $referenceId = $booking->id;
+            }
 
             if ($i === 0) {
                 $parentId = $booking->id;
@@ -140,14 +162,23 @@ class BookingController extends Controller
                 'details' => 'Booking created' . ($recurrence ? ' (recurring)' : '')
             ]);
 
-            // Send notification to PIC email
-            Notification::route('mail', $booking->pic_email)->notify(new BookingStatusChanged($booking));
+            // Send notification to PIC email if provided
+            if ($booking->pic_email) {
+                Notification::route('mail', $booking->pic_email)->notify(new BookingStatusChanged($booking));
+            }
             // Send notification to all admins
             $admins = \App\Models\User::where('is_admin', true)->get();
             Notification::send($admins, new NewBookingRequest($booking));
         }
 
-        return redirect('/')->with('success', 'Room booked successfully! Your booking is pending approval.');
+        $referenceCode = $referenceId ? 'BR-' . str_pad((string) $referenceId, 6, '0', STR_PAD_LEFT) : null;
+        $successMessage = 'Room booked successfully!';
+        if ($referenceCode) {
+            $successMessage .= ' Reference #: ' . $referenceCode . '.';
+        }
+        $successMessage .= ' Your booking is confirmed.';
+
+        return redirect('/')->with('success', $successMessage);
     }
 
     /**
@@ -392,30 +423,57 @@ class BookingController extends Controller
     }
 
     /**
-     * Process the booking lookup by email (public)
+     * Process the booking lookup by reference number (public)
      */
     public function lookup(Request $request)
     {
         $request->validate([
-            'email' => 'nullable|email',
+            'reference_no' => 'nullable|string|regex:/^BR-\d{6}$/',
             'date' => 'nullable|date',
+        ], [
+            'reference_no.regex' => 'Reference number must be in format BR-XXXXXX (e.g., BR-000001)',
         ]);
-        $email = $request->input('email');
+        
+        $referenceNo = $request->input('reference_no');
         $date = $request->input('date');
-        if (!$email && !$date) {
-            return back()->withErrors(['email' => 'Please enter an email or date to search.'])->withInput();
+        
+        if (!$referenceNo && !$date) {
+            return back()->withErrors(['reference_no' => 'Please enter a reference number or date to search.'])->withInput();
         }
+        
         $query = \App\Models\Booking::query();
-        if ($email) {
-            $query->where('pic_email', $email);
+        
+        if ($referenceNo) {
+            // Extract booking ID from reference number (BR-000001 -> 1)
+            $bookingId = (int) str_replace('BR-', '', $referenceNo);
+            if ($bookingId > 0) {
+                // Get the parent booking and all related bookings (for recurring bookings)
+                $parentBooking = \App\Models\Booking::find($bookingId);
+                if ($parentBooking) {
+                    $parentId = $parentBooking->parent_booking_id ?? $parentBooking->id;
+                    $query->where(function($q) use ($parentId, $bookingId) {
+                        $q->where('id', $parentId)
+                          ->orWhere('parent_booking_id', $parentId)
+                          ->orWhere('id', $bookingId);
+                    });
+                } else {
+                    // If booking not found, return empty result
+                    $query->whereRaw('1 = 0'); // Force no results
+                }
+            } else {
+                $query->whereRaw('1 = 0'); // Force no results
+            }
         }
+        
         if ($date) {
             $query->where('date', $date);
         }
+        
         $bookings = $query->with('meetingRoom')->orderBy('date', 'desc')->orderBy('start_time')->get();
+        
         return view('public.booking.lookup', [
             'bookings' => $bookings,
-            'oldEmail' => $email,
+            'oldReferenceNo' => $referenceNo,
             'oldDate' => $date,
         ]);
     }

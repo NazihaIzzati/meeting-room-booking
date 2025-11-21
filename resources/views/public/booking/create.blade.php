@@ -41,7 +41,7 @@
             </div>
 
             <!-- Date and Time -->
-            <div class="grid md:grid-cols-3 gap-4 mb-4">
+            <div class="grid gap-6 mb-4">
                 <div>
                     <label for="date" class="block text-sm font-medium text-gray-700 mb-2">Date *</label>
                     <input 
@@ -54,27 +54,65 @@
                         value="{{ old('date', request('date', $booking->date ?? '')) }}"
                     >
                 </div>
+
+                @php
+                    $startTimes = collect(range(8, 17))->map(function ($hour) {
+                        return sprintf('%02d:00', $hour);
+                    });
+                    $endTimes = collect(range(9, 18))->map(function ($hour) {
+                        return sprintf('%02d:00', $hour);
+                    });
+                @endphp
+
                 <div>
-                    <label for="start_time" class="block text-sm font-medium text-gray-700 mb-2">Start Time *</label>
-                    <input 
-                        id="start_time"
-                        type="time" 
-                        name="start_time" 
-                        required 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200" 
-                        value="{{ old('start_time', request('start_time', $booking->start_time ?? '')) }}"
-                    >
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Start Time *</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        @foreach($startTimes as $time)
+                        @php
+                            $formatted = \Carbon\Carbon::createFromFormat('H:i', $time)->format('g A');
+                            $isSelected = old('start_time', request('start_time', $booking->start_time ?? '')) === $time;
+                        @endphp
+                        <label class="cursor-pointer">
+                            <input 
+                                type="radio" 
+                                name="start_time" 
+                                value="{{ $time }}" 
+                                class="peer sr-only"
+                                {{ $isSelected ? 'checked' : '' }}
+                                required
+                            >
+                            <div class="w-full px-4 py-3 border border-gray-300 rounded-xl text-center text-sm font-semibold text-gray-700 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white">
+                                {{ $formatted }}
+                            </div>
+                        </label>
+                        @endforeach
+                    </div>
                 </div>
+
                 <div>
-                    <label for="end_time" class="block text-sm font-medium text-gray-700 mb-2">End Time *</label>
-                    <input 
-                        id="end_time"
-                        type="time" 
-                        name="end_time" 
-                        required 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200" 
-                        value="{{ old('end_time', $booking->end_time ?? '') }}"
-                    >
+                    <label class="block text-sm font-medium text-gray-700 mb-2">End Time *</label>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                        @foreach($endTimes as $time)
+                        @php
+                            $formatted = \Carbon\Carbon::createFromFormat('H:i', $time)->format('g A');
+                            $isSelected = old('end_time', $booking->end_time ?? '') === $time;
+                        @endphp
+                        <label class="cursor-pointer">
+                            <input 
+                                type="radio" 
+                                name="end_time" 
+                                value="{{ $time }}" 
+                                class="peer sr-only"
+                                {{ $isSelected ? 'checked' : '' }}
+                                required
+                            >
+                            <div class="w-full px-4 py-3 border border-gray-300 rounded-xl text-center text-sm font-semibold text-gray-700 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary peer-checked:text-white">
+                                {{ $formatted }}
+                            </div>
+                        </label>
+                        @endforeach
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2">Select an end time at least one hour after the start time.</p>
                 </div>
             </div>
 
@@ -104,30 +142,6 @@
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200" 
                         value="{{ old('pic_name', $booking->pic_name ?? '') }}"
                         placeholder="Full name"
-                    >
-                </div>
-                <div>
-                    <label for="pic_email" class="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
-                    <input 
-                        id="pic_email"
-                        type="email" 
-                        name="pic_email" 
-                        required 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200" 
-                        value="{{ old('pic_email', $booking->pic_email ?? '') }}"
-                        placeholder="your.email@company.com"
-                    >
-                </div>
-                <div>
-                    <label for="pic_phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-                    <input 
-                        id="pic_phone"
-                        type="tel" 
-                        name="pic_phone" 
-                        required 
-                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200" 
-                        value="{{ old('pic_phone', $booking->pic_phone ?? '') }}"
-                        placeholder="+1 (555) 123-4567"
                     >
                 </div>
                 <div>
@@ -198,12 +212,6 @@ $(document).ready(function() {
             }
         });
 
-        // Validate email format
-        const email = $('#pic_email').val();
-        if (email && !isValidEmail(email)) {
-            showError('#pic_email', 'Please enter a valid email address');
-            isValid = false;
-        }
 
         // Validate date
         const selectedDate = new Date($('#date').val());
@@ -233,10 +241,6 @@ $(document).ready(function() {
         $field.after('<div class="error-message text-red-600 text-xs mt-1">' + message + '</div>');
     }
 
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
 
     // Remove error on input
     $(document).on('input change', 'input, select', function() {

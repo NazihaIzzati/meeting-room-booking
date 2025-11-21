@@ -17,18 +17,15 @@ class PublicController extends Controller
      */
     public function index()
     {
-        // Get all meeting rooms with their current bookings
-        $meetingRooms = MeetingRoom::with(['bookings' => function($query) {
-            $query->where('date', '>=', Carbon::today())
-                  ->where('status', 'approved')
-                  ->orderBy('date')
-                  ->orderBy('start_time');
-        }])->get();
+        $today = Carbon::today()->format('Y-m-d');
+        
+        // Get all meeting rooms
+        $meetingRooms = MeetingRoom::all();
 
-        // Get today's bookings for quick overview
+        // Get today's bookings for quick overview (single source of truth)
         $todayBookings = Booking::with(['meetingRoom', 'user'])
-            ->where('date', Carbon::today())
-            ->where('status', 'approved')
+            ->where('date', $today)
+            ->where('status', '!=', 'cancelled')
             ->orderBy('start_time')
             ->get();
 
@@ -36,20 +33,21 @@ class PublicController extends Controller
         $upcomingBookings = Booking::with(['meetingRoom', 'user'])
             ->where('date', '>=', Carbon::today())
             ->where('date', '<=', Carbon::today()->addDays(7))
-            ->where('status', 'approved')
+            ->where('status', '!=', 'cancelled')
             ->orderBy('date')
             ->orderBy('start_time')
             ->get();
 
-        // Get room availability for today
+        // Get room availability for today using the same todayBookings data
         $roomAvailability = [];
         foreach ($meetingRooms as $room) {
-            $todayRoomBookings = $room->bookings->where('date', Carbon::today()->format('Y-m-d'));
+            // Filter today's bookings for this specific room
+            $todayRoomBookings = $todayBookings->where('meeting_room_id', $room->id);
             $roomAvailability[$room->id] = [
                 'room' => $room,
                 'bookings' => $todayRoomBookings,
                 'is_available' => $todayRoomBookings->isEmpty(),
-                'next_available' => $this->getNextAvailableTime($room, Carbon::today())
+                'next_available' => $this->getNextAvailableTime($todayRoomBookings, Carbon::today())
             ];
         }
 
@@ -64,14 +62,12 @@ class PublicController extends Controller
     /**
      * Get next available time for a room
      *
-     * @param MeetingRoom $room
+     * @param \Illuminate\Support\Collection $todayBookings
      * @param Carbon $date
      * @return string|null
      */
-    private function getNextAvailableTime($room, $date)
+    private function getNextAvailableTime($todayBookings, $date)
     {
-        $todayBookings = $room->bookings->where('date', $date->format('Y-m-d'));
-        
         if ($todayBookings->isEmpty()) {
             return 'Available all day';
         }
@@ -80,13 +76,13 @@ class PublicController extends Controller
         $currentTime = $now->format('H:i:s');
         
         // Find the next available slot
-        foreach ($todayBookings as $booking) {
+        foreach ($todayBookings->sortBy('end_time') as $booking) {
             if ($booking->end_time > $currentTime) {
                 return 'Available from ' . Carbon::parse($booking->end_time)->format('h:i A');
             }
         }
 
-        return 'Available tomorrow';
+        return 'Fully booked today';
     }
 
     /**

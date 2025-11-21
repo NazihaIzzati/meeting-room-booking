@@ -14,14 +14,15 @@
                 <i class='bx bx-search-alt-2 text-white text-3xl'></i>
             </div>
             <h1 class="text-2xl font-bold text-gray-900 mb-1">Check Your Booking Status</h1>
-            <p class="text-gray-500 text-center text-sm max-w-xs">Enter your email address (used as Person In Charge) to view all your meeting room bookings and their status.</p>
+            <p class="text-gray-500 text-center text-sm max-w-xs">Enter your booking reference number to view your meeting room booking details and status.</p>
         </div>
         <form method="POST" action="{{ route('booking.lookup') }}" class="w-full mb-6">
             @csrf
             <div class="mb-4">
-                <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                <input id="email" name="email" type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200" value="{{ old('email', $oldEmail ?? '') }}">
-                @error('email')
+                <label for="reference_no" class="block text-sm font-medium text-gray-700 mb-2">Booking Reference Number</label>
+                <input id="reference_no" name="reference_no" type="text" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors duration-200" placeholder="BR-000001" value="{{ old('reference_no', $oldReferenceNo ?? '') }}">
+                <p class="text-xs text-gray-500 mt-1">Format: BR-XXXXXX (e.g., BR-000001)</p>
+                @error('reference_no')
                     <div class="text-red-600 text-xs mt-1">{{ $message }}</div>
                 @enderror
             </div>
@@ -36,7 +37,7 @@
         </form>
         @if(isset($bookings))
             @if($bookings->isEmpty())
-                <div class="text-gray-500 text-center">No bookings found for this email.</div>
+                <div class="text-gray-500 text-center">No bookings found for this reference number.</div>
             @else
                 <div class="w-full grid gap-8 mt-8 grid-cols-1">
                     @foreach($bookings as $booking)
@@ -81,11 +82,12 @@
                                     </div>
                                     <div class="flex items-center gap-2">
                                         <i class='bx bx-id-card text-primary' title="Staff ID"></i>
-                                        <span class="font-semibold text-gray-700">Staff ID: {{ $booking->pic_staff_id }}</span>
+                                        <span class="font-semibold text-gray-700">Staff ID: {{ $booking->pic_staff_id ?? 'N/A' }}</span>
                                     </div>
                                     <div class="flex items-center gap-2">
-                                        <i class='bx bx-phone text-primary' title="Phone"></i>
-                                        <span class="font-semibold text-gray-700">Phone: {{ $booking->pic_phone }}</span>
+                                        <i class='bx bx-barcode text-primary' title="Reference Number"></i>
+                                        <span class="font-semibold text-gray-700">Reference: BR-{{ str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT) }}</span>
+                                        <button onclick="navigator.clipboard.writeText('BR-{{ str_pad((string) $booking->id, 6, '0', STR_PAD_LEFT) }}')" class="ml-2 text-base text-primary hover:underline" title="Copy reference"><i class='bx bx-copy'></i></button>
                                     </div>
                                 </div>
                             </div>

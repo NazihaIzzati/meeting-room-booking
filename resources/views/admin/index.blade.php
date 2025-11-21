@@ -176,14 +176,6 @@
                                     <p class="text-sm font-medium text-gray-900">{{ $booking->meeting_title }}</p>
                                     <p class="text-sm text-gray-500">{{ $booking->meetingRoom->name }} • {{ \Carbon\Carbon::parse($booking->date)->format('M j, Y') }}</p>
                                 </div>
-                                <div class="flex-shrink-0">
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                        @if($booking->status === 'approved') bg-green-100 text-green-800
-                                        @elseif($booking->status === 'pending') bg-orange-100 text-orange-800
-                                        @else bg-red-100 text-red-800 @endif">
-                                        {{ ucfirst($booking->status) }}
-                                    </span>
-                                </div>
                             </div>
                             @endforeach
                         </div>

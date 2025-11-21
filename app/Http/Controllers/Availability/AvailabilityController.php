@@ -21,7 +21,12 @@ class AvailabilityController extends Controller
         // Public: no login check
         $date = $request->query('date', now()->toDateString());
         $rooms = MeetingRoom::all();
-        $bookings = Booking::with('meetingRoom', 'user')->where('date', $date)->get();
+        // Get all bookings for the date (approved and pending, but not cancelled)
+        $bookings = Booking::with('meetingRoom', 'user')
+            ->where('date', $date)
+            ->where('status', '!=', 'cancelled')
+            ->orderBy('start_time')
+            ->get();
 
         return view('public.booking.availability', compact('rooms', 'bookings', 'date'));
     }
