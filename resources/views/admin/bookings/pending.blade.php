@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.admin')
 @section('content')
 <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-8">
     <h2 class="text-2xl font-bold mb-2 text-blue-700">Approve Bookings</h2>

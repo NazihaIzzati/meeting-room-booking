@@ -1,4 +1,4 @@
-@extends('layouts.master')
+@extends('layouts.admin')
 @section('content')
 <div class="max-w-xl mx-auto bg-white rounded-xl shadow-lg p-4 sm:p-8">
     <h2 class="text-2xl font-bold mb-6 text-blue-700">Add Room</h2>
