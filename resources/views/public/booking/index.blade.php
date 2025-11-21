@@ -2,9 +2,17 @@
 
 @section('content')
 <div class="container mx-auto py-8">
-    <h2 class="text-2xl font-bold mb-6">My Bookings</h2>
-    <div class="flex justify-end mb-4">
-        <a href="/dashboard" class="inline-block px-4 py-2 bg-[#1b1b18] text-white rounded hover:bg-black">Book a Room</a>
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold">My Bookings</h2>
+        <div class="flex flex-wrap gap-3 justify-end">
+            @if(auth()->check() && auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="inline-flex items-center px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-100">
+                    <i class='bx bx-arrow-back mr-2'></i>
+                    Back to Admin Dashboard
+                </a>
+            @endif
+            <a href="/dashboard" class="inline-block px-4 py-2 bg-[#1b1b18] text-white rounded hover:bg-black">Book a Room</a>
+        </div>
     </div>
     @php
         $today = now()->toDateString();

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UpdateProfileRequest extends FormRequest
@@ -22,7 +23,7 @@ class UpdateProfileRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = [
             'name' => ['required', 'string', 'max:255'],
             'email' => [
                 'required', 
@@ -31,8 +32,30 @@ class UpdateProfileRequest extends FormRequest
             ],
             'phone' => ['nullable', 'string', 'max:32'],
             'staff_id' => ['nullable', 'string', 'max:32'],
-            'password' => ['nullable', 'string', 'min:6', 'confirmed'],
         ];
+
+        // If password is being changed, require current password
+        if ($this->filled('password')) {
+            $rules['current_password'] = ['required', 'string'];
+            $rules['password'] = ['required', 'string', 'min:8', 'confirmed'];
+        }
+
+        return $rules;
+    }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            // Verify current password if password is being changed
+            if ($this->filled('password') && $this->filled('current_password')) {
+                if (!Hash::check($this->current_password, auth()->user()->password)) {
+                    $validator->errors()->add('current_password', 'The current password is incorrect.');
+                }
+            }
+        });
     }
 
     /**
@@ -50,7 +73,9 @@ class UpdateProfileRequest extends FormRequest
             'email.unique' => 'This email address is already taken.',
             'phone.max' => 'Phone number cannot exceed 32 characters.',
             'staff_id.max' => 'Staff ID cannot exceed 32 characters.',
-            'password.min' => 'Password must be at least 6 characters.',
+            'current_password.required' => 'Current password is required to change your password.',
+            'password.required' => 'New password is required.',
+            'password.min' => 'Password must be at least 8 characters.',
             'password.confirmed' => 'Password confirmation does not match.',
         ];
     }
@@ -67,6 +92,7 @@ class UpdateProfileRequest extends FormRequest
             'email' => 'email address',
             'phone' => 'phone number',
             'staff_id' => 'staff ID',
+            'current_password' => 'current password',
             'password' => 'password',
         ];
     }

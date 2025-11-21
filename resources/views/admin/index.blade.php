@@ -46,21 +46,6 @@
                 </div>
             </div>
 
-            <!-- Pending Bookings Card -->
-            <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 border border-gray-100">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm font-medium text-gray-600">Pending</p>
-                        <p class="text-3xl font-bold text-orange-600">{{ \App\Models\Booking::where('user_id', Auth::id())->where('status', 'pending')->count() }}</p>
-                    </div>
-                    <div class="h-12 w-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                        <i class='bx bx-time text-orange-600 text-2xl'></i>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <span class="text-sm text-gray-500">Awaiting approval</span>
-                </div>
-            </div>
 
             <!-- Approved Bookings Card -->
             <div class="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 p-6 border border-gray-100">
@@ -142,7 +127,7 @@
                             </div>
                         </a>
                         
-                        <a href="/profile" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200">
+                        <a href="{{ route('admin.profile.show') }}" class="flex items-center p-4 bg-gray-50 hover:bg-gray-100 rounded-xl transition-all duration-200">
                             <i class='bx bx-user text-2xl text-gray-600 mr-3'></i>
                             <div>
                                 <p class="font-semibold text-gray-900">Profile Settings</p>

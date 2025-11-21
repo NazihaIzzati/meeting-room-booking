@@ -70,7 +70,7 @@
     </div>
     @endif
     <div class="mt-6">
-        <a href="/admin/bookings/pending" class="text-blue-600 underline">Back to Approve Bookings</a>
+        <a href="{{ route('admin.bookings.index') }}" class="text-blue-600 underline">Back to All Bookings</a>
     </div>
 </div>
 @endsection 

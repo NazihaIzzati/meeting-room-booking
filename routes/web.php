@@ -63,7 +63,6 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->as('admin.')->group(funct
 
     // Booking Management (Full CRUD)
     Route::resource('bookings', AdminBookingController::class)->except(['create', 'store'])->names('bookings');
-    Route::get('/bookings/pending', [AdminBookingController::class, 'pending'])->name('bookings.pending');
     Route::get('/bookings/export', [AdminBookingController::class, 'export'])->name('bookings.export');
     
     // Approval actions (now inside admin group)

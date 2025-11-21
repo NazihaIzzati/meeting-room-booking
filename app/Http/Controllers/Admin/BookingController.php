@@ -14,21 +14,6 @@ use Illuminate\Support\Facades\Auth;
 class BookingController extends Controller
 {
     /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct()
-    {
-        $this->middleware(function ($request, $next) {
-            if (!Auth::check() || !Auth::user()->isAdmin()) {
-                abort(403, 'Unauthorized');
-            }
-            return $next($request);
-        });
-    }
-
-    /**
      * Display a listing of all bookings (READ operation)
      *
      * @return \Illuminate\View\View
@@ -43,46 +28,6 @@ class BookingController extends Controller
         return view('admin.bookings.index', compact('bookings'));
     }
 
-    /**
-     * Display a listing of pending bookings (READ operation)
-     *
-     * @param Request $request
-     * @return \Illuminate\View\View
-     */
-    public function pending(Request $request)
-    {
-        $query = Booking::with(['meetingRoom', 'user'])->where('status', 'pending');
-        
-        if ($search = $request->query('search')) {
-            $query->where(function($q) use ($search) {
-                $q->where('meeting_title', 'like', "%$search%")
-                  ->orWhere('pic_name', 'like', "%$search%")
-                  ->orWhereHas('user', function($uq) use ($search) {
-                      $uq->where('name', 'like', "%$search%")
-                         ->orWhere('email', 'like', "%$search%");
-                  });
-            });
-        }
-
-        if ($date = $request->query('date')) {
-            $query->where('date', $date);
-        }
-
-        if ($room = $request->query('room')) {
-            $query->where('meeting_room_id', $room);
-        }
-
-        $bookings = $query->orderBy('date')->orderBy('start_time')->paginate(15)->withQueryString();
-        $rooms = MeetingRoom::all();
-
-        return view('admin.bookings.pending', [
-            'bookings' => $bookings,
-            'rooms' => $rooms,
-            'filter_search' => $search,
-            'filter_date' => $date,
-            'filter_room' => $room,
-        ]);
-    }
 
     /**
      * Display the specified booking (READ operation)

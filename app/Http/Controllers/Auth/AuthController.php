@@ -138,10 +138,20 @@ class AuthController extends Controller
     public function updateProfile(UpdateProfileRequest $request)
     {
         $user = Auth::user();
-        $user->update($request->only('name', 'email'));
         
+        // Update name and email
+        $user->update([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'staff_id' => $request->staff_id,
+        ]);
+        
+        // Update password if provided
         if ($request->filled('password')) {
-            $user->update(['password' => Hash::make($request->password)]);
+            $user->update([
+                'password' => Hash::make($request->password)
+            ]);
         }
 
         return back()->with('success', 'Profile updated successfully.');

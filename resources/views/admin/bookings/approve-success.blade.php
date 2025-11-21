@@ -25,7 +25,7 @@
             </div>
         </div>
         <div class="flex gap-3 w-full">
-            <a href="/admin/bookings/pending" class="flex-1 bg-primary text-white py-2 rounded font-semibold text-center hover:bg-primary/90 transition">Back to Pending Approvals</a>
+            <a href="{{ route('admin.bookings.index') }}" class="flex-1 bg-primary text-white py-2 rounded font-semibold text-center hover:bg-primary/90 transition">View All Bookings</a>
             <a href="/admin/bookings" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded font-semibold text-center hover:bg-gray-300 transition">View All Bookings</a>
         </div>
     </div>

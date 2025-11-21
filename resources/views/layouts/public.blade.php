@@ -50,7 +50,12 @@
                 </div>
                 
                 <div class="flex items-center space-x-2 sm:space-x-4">
-                    {{-- Navigation items hidden for public users - only visible to authenticated users --}}
+                    <a href="{{ route('booking.lookup.form') }}" class="hidden sm:inline-flex text-sm font-semibold text-gray-600 hover:text-primary transition">
+                        Find Booking
+                    </a>
+                    <a href="{{ route('bookings.create') }}" class="px-4 py-2 rounded-full bg-primary text-white text-sm font-semibold shadow hover:bg-primary-dark transition">
+                        Book Now
+                    </a>
                 </div>
             </div>
         </div>

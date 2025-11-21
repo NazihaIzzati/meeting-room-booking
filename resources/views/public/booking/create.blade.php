@@ -5,10 +5,18 @@
 @section('content')
 <div class="min-h-screen bg-gradient-to-br from-primary-light to-white py-10 px-4">
     <div class="max-w-5xl w-full bg-white rounded-2xl shadow-lg p-12 flex flex-col items-center mx-auto mt-10 relative">
-        <a href="/" class="absolute left-8 top-8 flex items-center gap-2 text-primary font-semibold hover:underline hover:text-primary-dark transition-colors duration-200">
-            <i class='bx bx-arrow-back'></i>
-            Back to Home
-        </a>
+        <div class="absolute left-8 top-8 flex gap-3">
+            <a href="/" class="flex items-center gap-2 text-primary font-semibold hover:underline hover:text-primary-dark transition-colors duration-200">
+                <i class='bx bx-arrow-back'></i>
+                Back to Home
+            </a>
+            @if(auth()->check() && auth()->user()->isAdmin())
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 text-gray-600 font-semibold hover:text-primary transition-colors duration-200">
+                    <i class='bx bx-grid-alt'></i>
+                    Admin Dashboard
+                </a>
+            @endif
+        </div>
         
         <div class="flex flex-col items-center mb-6">
             <div class="h-16 w-16 rounded-full bg-primary flex items-center justify-center shadow mb-3">

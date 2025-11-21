@@ -28,7 +28,6 @@
     </script>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    @php $pendingCount = \App\Models\Booking::where('status', 'pending')->count(); @endphp
     <div class="flex min-h-screen">
         <!-- Sidebar -->
         <aside class="w-64 bg-white shadow-lg flex flex-col">
@@ -42,7 +41,7 @@
 
             <!-- Navigation -->
             <nav class="flex-1 px-4 py-6 space-y-2">
-                <a href="/dashboard" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors duration-200 {{ request()->is('dashboard') ? 'bg-primary text-white' : 'text-gray-700' }}">
+                <a href="{{ route('admin.dashboard') }}" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors duration-200 {{ request()->is('admin/dashboard') ? 'bg-primary text-white' : 'text-gray-700' }}">
                     <i class='bx bx-home-alt text-xl mr-3'></i>
                     <span>Dashboard</span>
                 </a>
@@ -57,13 +56,6 @@
                     <span>All Bookings</span>
                 </a>
 
-                <a href="/admin/bookings/pending" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors duration-200 {{ request()->is('admin/bookings/pending*') ? 'bg-primary text-white' : 'text-gray-700' }}">
-                    <i class='bx bx-time text-xl mr-3'></i>
-                    <span>Pending Bookings</span>
-                    @if($pendingCount > 0)
-                        <span class="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ $pendingCount }}</span>
-                    @endif
-                </a>
 
                 <a href="/admin/audit-logs" class="flex items-center px-4 py-3 rounded-lg hover:bg-gray-100 transition-colors duration-200 {{ request()->is('admin/audit-logs*') ? 'bg-primary text-white' : 'text-gray-700' }}">
                     <i class='bx bx-history text-xl mr-3'></i>
@@ -93,13 +85,14 @@
                     </div>
                 </div>
                 <div class="mt-3 space-y-1">
-                    <a href="/profile" class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                    <a href="{{ route('admin.profile.show') }}" class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200">
                         <i class='bx bx-user mr-2'></i>
                         <span>Profile</span>
                     </a>
-                    <form method="POST" action="/logout" class="block">
+                    <form method="POST" action="{{ route('admin.logout') }}" id="sidebar-logout-form" class="block">
                         @csrf
-                        <button type="submit" class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200">
+                        <button type="button" class="w-full flex items-center px-3 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors duration-200"
+                            onclick="confirmLogout('sidebar-logout-form')">
                             <i class='bx bx-log-out mr-2'></i>
                             <span>Logout</span>
                         </button>
@@ -125,7 +118,6 @@
                         <div class="relative">
                             <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                                 <i class='bx bx-bell text-xl text-gray-600'></i>
-                                <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">{{ $pendingCount ?? 0 }}</span>
                             </button>
                         </div>
 
@@ -134,6 +126,17 @@
                             <input type="text" placeholder="Search..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
                             <i class='bx bx-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400'></i>
                         </div>
+
+                        <!-- Logout -->
+                        <form method="POST" action="{{ route('admin.logout') }}" id="topbar-logout-form">
+                            @csrf
+                            <button type="button"
+                                class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition"
+                                onclick="confirmLogout('topbar-logout-form')">
+                                <i class='bx bx-log-out mr-2 text-lg'></i>
+                                Logout
+                            </button>
+                        </form>
                     </div>
                 </div>
             </header>
@@ -188,6 +191,13 @@
                 });
             }
         });
+
+        // Logout confirmation
+        window.confirmLogout = function(formId) {
+            if (confirm('Are you sure you want to log out?')) {
+                document.getElementById(formId).submit();
+            }
+        };
     </script>
 </body>
 </html> 

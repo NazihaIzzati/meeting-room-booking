@@ -35,7 +35,7 @@ class NewBookingRequest extends Notification implements ShouldQueue
             ->line('Date: ' . $this->booking->date)
             ->line('Time: ' . $this->booking->start_time . ' - ' . $this->booking->end_time)
             ->line('PIC: ' . $this->booking->pic_name . ' (' . $this->booking->pic_email . ')')
-            ->action('Approve Booking', url('/admin/bookings/pending'))
+            ->action('View Bookings', url('/admin/bookings'))
             ->salutation('Thank you!');
     }
 } 
