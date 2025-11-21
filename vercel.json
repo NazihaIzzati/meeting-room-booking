@@ -1,7 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "curl -sS https://getcomposer.org/installer | php && php composer.phar install --no-dev --optimize-autoloader --no-interaction",
-  "installCommand": "curl -sS https://getcomposer.org/installer | php && php composer.phar install --no-dev --optimize-autoloader --no-interaction",
   "outputDirectory": ".",
   "functions": {
     "api/index.php": {

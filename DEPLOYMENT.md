@@ -51,6 +51,9 @@
 
 ## 🚀 Vercel Deployment (If You Still Want to Try)
 
+### ⚠️ Important: Vercel Build Limitation
+**Vercel's build environment doesn't have PHP/Composer available.** You must commit the `vendor` directory to your repository for Vercel to work. This is not ideal but necessary.
+
 ### Prerequisites:
 1. Your code must be in a Git repository (GitHub, GitLab, or Bitbucket)
 2. Database must be hosted separately (Supabase, Railway, etc.)
@@ -58,26 +61,51 @@
 
 ### Steps:
 
-1. **Create the API directory** (already done):
+1. **Commit the vendor directory** (Required for Vercel):
+   ```bash
+   # Remove vendor from .gitignore temporarily
+   sed -i.bak '/^\/vendor$/d' .gitignore
+   
+   # Install dependencies locally
+   composer install --no-dev --optimize-autoloader
+   
+   # Commit vendor directory
+   git add vendor/ .gitignore
+   git commit -m "Add vendor directory for Vercel deployment"
+   
+   # Restore .gitignore (optional, or keep vendor committed)
+   # mv .gitignore.bak .gitignore
+   ```
+
+2. **Create the API directory** (already done):
    ```bash
    mkdir -p api
    # api/index.php is already created
    ```
 
-2. **Push to GitHub:**
+3. **Push to GitHub:**
    ```bash
    git add .
    git commit -m "Add Vercel configuration"
    git push
    ```
 
-3. **Deploy on Vercel:**
+4. **Deploy on Vercel:**
    - Go to [vercel.com](https://vercel.com)
    - Click "Add New Project"
    - Import your GitHub repository
-   - Vercel will auto-detect the `vercel.json` configuration
+   - **Important**: In Project Settings:
+     - **General Settings:**
+       - Set **Node.js Version** to `22.x` (required for vercel-php@0.7.4)
+     - **Framework Settings:**
+       - Set **Framework Preset** to "Other"
+       - Set **Root Directory** to "." (or leave blank)
+       - Set **Output Directory** to "." (or leave blank) - Laravel doesn't use a dist folder
+       - **DO NOT override** Build/Install commands (leave them as default or empty)
+       - The `vendor` directory will be used from your repository
+   - The `vercel.json` configuration will also be used (runtime: vercel-php@0.7.4)
 
-4. **Set Environment Variables in Vercel Dashboard:**
+5. **Set Environment Variables in Vercel Dashboard:**
    ```
    APP_KEY=base64:your-generated-key
    APP_ENV=production
